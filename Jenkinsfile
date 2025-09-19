@@ -2,32 +2,31 @@ pipeline {
     agent any
 
     stages {
-        stage('Checkout Code') {
+        stage('Checkout') {
             steps {
-                git 'https://github.com/JeevanKumar100/Subway-Surfers_Fork.git'  // replace with your repo URL
+                git 'https://github.com/JeevanKumar100/Subway-Surfers_Fork.git'
             }
         }
 
         stage('Build Docker Image') {
             steps {
-                script {
-                    docker.build("mygame:latest")
-                }
+                sh 'docker build -t subway-surfers:latest .'
             }
         }
 
-        stage('Run Docker Container') {
+        stage('Deploy Container') {
             steps {
-                script {
-                    sh 'docker run -d -p 8080:80 --name mygame-container mygame:latest'
-                }
+                // Stop any existing container
+                sh 'docker rm -f subway-surfers-container || true'
+                // Start new container
+                sh 'docker run -d -p 8080:80 --name subway-surfers-container subway-surfers:latest'
             }
         }
     }
 
     post {
         always {
-            echo 'Pipeline Finished'
+            echo 'Done! 🚀'
         }
     }
 }
